@@ -1,13 +1,14 @@
 import pandas as pd
-import missingno as msno
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 # Data import
 df = pd.read_csv("data/01_raw/en.openfoodfacts.org.products.tsv",
                  sep="\t", low_memory=False)
 
-# ---- Data selection ---- #
+
+#--------------------------#
+#----- Data selection -----#
+#--------------------------#
+
 
 #  Set df["countries"] to "France" for all France related product
 df["countries"].str.replace(r".*(fr).*", "France", case=False, regex=True)
@@ -36,16 +37,27 @@ df = df[
     ]
 ]
 
-# ---- Missing values treatment ---- #
+#-----------------------------------#
+#----- Missing values treatment ----#
+#-----------------------------------#
+
 
 # Drop lines without product_name
 df = df[df.product_name.notna()]
 
+
+#--------------------------------#
 # ---- Duplicates Treatment ---- #
+#--------------------------------#
+
 
 df.drop_duplicates(inplace=True)
 
-# ---- Outliers treatment ---- #
+
+#----------------------------#
+#---- Outliers treatment ----#
+#----------------------------#
+
 
 # Max energy_100g can't exceed 3700Kj
 df = df[df["energy_100g"] <= 3700]
@@ -65,7 +77,10 @@ cols = df[[
 for col in cols:
     df = df[df[col] <= 100]
 
-# Data export
+
+#-----------------------#
+#----- Data export -----#
+#-----------------------#
 
 df.to_csv("data/02_intermediate/foodflix.csv")
 print("Done !")
