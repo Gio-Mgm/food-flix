@@ -15,8 +15,8 @@ https://www.kaggle.com/openfoodfacts/world-food-facts/download
 │   │   ├── 02_intermediate
 │   │   │   └── foodflix.csv
 │   │   └── slides
-│   │       ├── Présentation FoodFlix.pdf
-│   │       └── Présentation FoodFlix.pptx
+│   │       ├── slides_foodflix.pdf
+│   │       └── slides_foodflix.pptx
 │   └── src
 │       ├── data_analysis.ipynb
 │       └── data_cleaning.py
