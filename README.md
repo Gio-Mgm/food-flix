@@ -12,11 +12,11 @@ https://www.kaggle.com/openfoodfacts/world-food-facts/download
 │   ├── data
 │   │   ├── 01_raw
 │   │   │   └── en.openfoodfacts.org.products.tsv
-│   │   ├── 02_intermediate
-│   │   │   └── foodflix.csv
-│   │   └── slides
-│   │       ├── slides_foodflix.pdf
-│   │       └── slides_foodflix.pptx
+│   │   └── 02_intermediate
+│   │       └── foodflix.csv
+│   ├── slides
+│   │   ├── slides_foodflix.pdf
+│   │   └── slides_foodflix.pptx
 │   └── src
 │       ├── data_analysis.ipynb
 │       └── data_cleaning.py
