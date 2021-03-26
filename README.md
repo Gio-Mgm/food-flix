@@ -19,7 +19,14 @@ https://www.kaggle.com/openfoodfacts/world-food-facts/download
 │   │   └── slides_foodflix.pptx
 │   └── src
 │       ├── data_analysis.ipynb
-│       └── data_cleaning.py
+│       ├── data_cleaning.py
+|       ├── pairplots_full_df.jpg
+|       ├── pairplots_sample_100.jpg
+|       ├── pairplots_sample_1000.jpg
+|       ├── pairplots_sample_10000.jpg
+|       ├── pairplots_sample_20000.jpg
+|       ├── pairplots_sample_500.jpg
+|       └── pairplots_sample_5000.jpg
 ├── .gitignore
 ├── README.md
 └── requierements.txt
