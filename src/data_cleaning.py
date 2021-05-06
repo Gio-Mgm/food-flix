@@ -1,4 +1,6 @@
 import pandas as pd
+import numpy as np
+from functions import reduce_mem_usage
 
 # Data import
 df = pd.read_csv("data/01_raw/en.openfoodfacts.org.products.tsv",
@@ -45,7 +47,6 @@ df = df[
 # Drop lines without product_name
 df = df[df.product_name.notna()]
 
-
 #--------------------------------#
 # ---- Duplicates Treatment ---- #
 #--------------------------------#
@@ -77,10 +78,29 @@ cols = df[[
 for col in cols:
     df = df[df[col] <= 100]
 
+df['nutrition_grade_fr'] = np.where(
+    df['nutrition_grade_fr'].str.isalpha(), 
+    df['nutrition_grade_fr'].str.upper(), 
+    df['nutrition_grade_fr'])
+
+
+df.fillna("Non Renseigné", axis=1, inplace=True)
+
+df["brands"] = df["brands"].str.split(",", n=1, expand=True).astype('str')
+
+df["allergens"] = df["allergens"].apply(
+    lambda x: (" ,").join(set(str(x).lower().split(', ')))
+)
+
+df['content'] = df[["product_name", "brands", "categories"]].astype(str).apply(lambda x: ' // '.join(x).lower(), axis=1)
+df['content'].fillna('Null', inplace=True)
+
 
 #-----------------------#
 #----- Data export -----#
 #-----------------------#
+
+df, NAlist = reduce_mem_usage(df)
 
 df.to_csv("data/02_intermediate/foodflix.csv")
 print("Done !")
