@@ -89,7 +89,7 @@ df.fillna("Non Renseigné", axis=1, inplace=True)
 df["brands"] = df["brands"].str.split(",", n=1, expand=True).astype('str')
 
 df["allergens"] = df["allergens"].apply(
-    lambda x: (" ,").join(set(str(x).lower().split(', ')))
+    lambda x: ", ".join(set(str(x).lower().split(', ')))
 )
 
 df['content'] = df[["product_name", "brands", "categories"]].astype(str).apply(lambda x: ' // '.join(x).lower(), axis=1)

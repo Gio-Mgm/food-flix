@@ -16,10 +16,13 @@ st.title("Foodflix")
 
 user_input = st.sidebar.text_input('Que recherchez vous?').lower()
 
+allergens = pd.Series(", ".join(df["allergens"]).split(','))
+a = allergens.value_counts()
+a = a[a > 100].index[1:]
+
 allergens_filter = st.sidebar.multiselect(
-    'Filtre allergènes', ["Lait", "Oeuf", "Soja"])
-
-
+    'Filtre allergènes', list(a)
+)
 
 if user_input:
     finds = find_closest(tf, tfidf_matrix, df, user_input)
