@@ -78,23 +78,36 @@ cols = df[[
 for col in cols:
     df = df[df[col] <= 100]
 
+#-----------------------#
+#---- Format values ----#
+#-----------------------#
+
 df['nutrition_grade_fr'] = np.where(
-    df['nutrition_grade_fr'].str.isalpha(), 
-    df['nutrition_grade_fr'].str.upper(), 
+    df['nutrition_grade_fr'].str.isalpha(),
+    df['nutrition_grade_fr'].str.upper(),
     df['nutrition_grade_fr'])
 
 
 df.fillna("Non Renseigné", axis=1, inplace=True)
+df["product_name"] = df["product_name"].str.strip().str.lower().str.capitalize()
 
-df["brands"] = df["brands"].str.split(",", n=1, expand=True).astype('str')
+df["brands"] = df["brands"].str.split(",", n=1, expand=True)
+df["brands"] = df["brands"].str.strip().str.lower().str.capitalize()
 
 df["allergens"] = df["allergens"].apply(
     lambda x: ", ".join(set(str(x).lower().split(', ')))
 )
 
-df['content'] = df[["product_name", "brands", "categories"]].astype(str).apply(lambda x: ' // '.join(x).lower(), axis=1)
+df['content'] = df[["product_name", "brands"]].astype(str).apply(lambda x: ' // '.join(x).lower(), axis=1)
 df['content'].fillna('Null', inplace=True)
 
+df["ingredients_text"] = df["ingredients_text"].apply(
+    lambda x:
+        x.replace(";", ",")
+         .replace("&quot,", "")
+         .replace("_", "")
+         .replace("•", ",")
+         .replace("-", ","))
 
 #-----------------------#
 #----- Data export -----#
