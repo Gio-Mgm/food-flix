@@ -1,34 +1,97 @@
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
+from sentence_transformers import SentenceTransformer, models
 from streamlit_CONST import STOPS
 from sklearn.metrics.pairwise import linear_kernel
 from fuzzywuzzy import process
 
 def fit_model(df, method):
+    """
+        Fitting chosen model
+
+        params:
+            df: DataFrame used,
+            method: model chosen
+
+        returns:
+            generated model,
+            transformed datas
+    """
+
     if method == "TF-IDF":
         model = TfidfVectorizer(analyzer='word', ngram_range=(1, 2),
                                 min_df=0, stop_words=STOPS)
+        X = model.fit_transform(df['content'])
     elif method == "CountVectorizer":
         model = CountVectorizer(analyzer='word', ngram_range=(1, 2),
                             min_df=0, stop_words=STOPS)
-    else:
-        return "BERT"
-    X = model.fit_transform(df['content'])
-    return [model, X]
+        X = model.fit_transform(df['content'])
+    elif method == "BERT":
+        word_embedding_model = models.Transformer('camembert-base')
+        pooling_model = models.Pooling(
+            word_embedding_model.get_word_embedding_dimension(),
+            pooling_mode_mean_tokens=True,
+            pooling_mode_max_tokens=False)
+        model = SentenceTransformer(modules=[word_embedding_model, pooling_model])
+        X = model.encode(df['content'], show_progress_bar=True)
+    return model, X
 
-def find_closest(model, X, query):
-    x = model.transform([query])
+#=====================================================================#
+
+def find_closest(model, X, query, method):
+    """
+        Find closest results using cosine similarities
+
+        params:
+            model: model used,
+            X:
+
+        returns:
+            list of indexes of closest results
+
+    """
+    if method == "BERT":
+        x = model.encode([query])
+    else:
+        x = model.transform([query])
     cosine_similarities = linear_kernel(x, X)
-    similar_indices = cosine_similarities[0].argsort()[:-10:-1]
-    return [i for i in similar_indices]
+    similar_indices = cosine_similarities[0].argsort()[:-21:-1]
+    return similar_indices
+
+#=====================================================================#
 
 def find_fuzzy(x, series):
-    return process.extractBests(x, series, limit=10)
+    """
+        Find with fuzzy wuzzy
+    
+        params:
+            x: target to find,
+            series: location to search
+    
+        returns:
+            list of tuples of extractBests
+    """
+    
+    return process.extractBests(x, series, limit=5)
 
-def get_allergens(series):
+#=====================================================================#
+
+def get_list_of_unique_most(series, thresh=100):
+    """
+        Get list of most represanted values in a series
+    
+        params:
+            series: series to look at,
+            thresh: threshold
+        returns:
+            list of values
+    """
+    
     s = pd.Series(", ".join(series).split(','))
     a = s.value_counts()
-    return list(a[a > 100].index[1:])
+    return list(a[a > thresh].index[1:])
+
+#=====================================================================#
 
 def get_results(df, found, short):
     results = []

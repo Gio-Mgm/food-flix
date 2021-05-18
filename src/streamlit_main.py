@@ -1,8 +1,7 @@
 import pandas as pd
 import streamlit as st
 from streamlit_CONST import WARN_INPUT_NOT_FOUND
-from streamlit_functions import find_closest, get_allergens, get_results, fit_model, find_fuzzy
-from fuzzywuzzy import fuzz
+from streamlit_functions import find_closest, get_list_of_unique_most, get_results, fit_model, find_fuzzy
 
 df = pd.read_csv("./data/02_intermediate/foodflix.csv", index_col=0)
 
@@ -34,32 +33,36 @@ short = st.sidebar.checkbox("Affichage simplifié", value=True)
 
 if user_input and not short:
     allergens_filter = st.sidebar.multiselect(
-        'Filtre allergènes', get_allergens(df["allergens"])
+        'Filtre allergènes', get_list_of_unique_most(df["allergens"])
     )
 # -------------- #
 # Body component #
 # -------------- #
+
 if user_input:
-    results_are_shown = True
-    empty = st.empty()
+    show_results = True
+    container = st.empty()
     if df["product_name"].to_string().find(user_input) == -1 or df["brands"].to_string().find(user_input) == -1:
-        with empty.beta_container():
-            results_are_shown = False
+        show_results = False
+        
+        with container.beta_container():
             fuzzies = find_fuzzy(user_input, df["product_name"].to_list())
-            st.warning(WARN_INPUT_NOT_FOUND.format(user_input))
+            
             choices = [fuzzy[0] for fuzzy in fuzzies]
             choices.insert(0, "")
             choices = list(set(choices))
             choices.sort()
+            
+            st.warning(WARN_INPUT_NOT_FOUND.format(user_input))
             radio = st.radio("", choices)
+
             if radio != "":
                 user_input = radio
-                results_are_shown = True
-                empty.empty()
-                print(user_input, type(user_input))
+                show_results = True
+                container.empty()
 
-    if results_are_shown:
-        found = find_closest(model, X, user_input)
+    if show_results:
+        found = find_closest(model, X, user_input, method)
         results = get_results(df, found, short)
 
         for _, el in enumerate(results):

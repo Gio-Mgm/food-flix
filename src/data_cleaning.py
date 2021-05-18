@@ -89,10 +89,14 @@ df['nutrition_grade_fr'] = np.where(
 
 
 df.fillna("Non Renseigné", axis=1, inplace=True)
-df["product_name"] = df["product_name"].str.strip().str.lower().str.capitalize()
+df["product_name"] = df["product_name"].str.strip().str.replace(
+    "-", " ").str.lower().str.title()
 
 df["brands"] = df["brands"].str.split(",", n=1, expand=True)
-df["brands"] = df["brands"].str.strip().str.lower().str.capitalize()
+df["brands"] = df["brands"].str.strip().str.replace(
+    "-", " ").str.lower().str.title()
+df.drop_duplicates(subset=["product_name", "brands"],
+                   keep='first', inplace=True)
 
 df["allergens"] = df["allergens"].apply(
     lambda x: ", ".join(set(str(x).lower().split(', ')))
@@ -114,6 +118,7 @@ df["ingredients_text"] = df["ingredients_text"].apply(
 #-----------------------#
 
 df, NAlist = reduce_mem_usage(df)
+
 
 df.to_csv("data/02_intermediate/foodflix.csv")
 print("Done !")
